@@ -1,0 +1,46 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'co.riiid:gradle-github-plugin:0.3.1'
+        classpath 'net.saliman:gradle-properties-plugin:1.4.4'
+    }
+}
+
+plugins {
+    id "com.xebialabs.xlr.docker" version "1.1.12"
+}
+
+def getVersionName = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe', '--tags'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+version=getVersionName()
+apply plugin: 'net.saliman.properties'
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'co.riiid.gradle'
+println 'build/libs/xlr-hipchat-plugin-${getVersionName}.jar'
+github {
+    owner = 'wianvos'
+    repo = 'xlr-hipchat-plugin'
+    token = "$github_token"
+    tagName = getVersionName()
+    targetCommitish = 'master'
+    name = getVersionName()
+    assets = [
+            "build/libs/xlr-hipchat-plugin-"+getVersionName()+".jar"
+    ]
+}
+
+
+xlrDocker {
+    version = '5.0.1.10'
+}
