@@ -8,12 +8,14 @@ import json
 #init vars and check params
 url = hipchatServer['serverName']
 token = hipchatServer['token']
-user = hipchatServer['username']
 proxyUrl = hipchatServer['proxyUrl']
 
+notify = False
 color = 'green'
+
 if urgent == True :
     color = 'red'
+    notify = True
 
 
 
@@ -67,7 +69,7 @@ def hipchat_notify(token, room, message, color='yellow', notify=False,
 
 try:
     for r in room.split(';') :
-        hipchat_notify(token, r, message, color, host=url)
+        hipchat_notify(token, r, message, color,notify=notify, host=url)
 except Exception as e:
         msg = "[ERROR] HipChat notify failed: %s" % e
         print msg

@@ -12,10 +12,11 @@ serverName = hipchatServer['serverName']
 token = hipchatServer['token']
 proxyUrl = hipchatServer['proxyUrl']
 
+notify=False
 color = 'green'
 if urgent == True :
     color = 'red'
-
+    notify= True
 
 latest_messages = {}
 
@@ -50,7 +51,7 @@ def hipchat_notify(token, room, message, label, color='yellow', notify=False,
         Host to connect to, defaults to api.hipchat.com
     """
 
-    message = "Xlr :: %s :: %s" % (label, message)
+    message = "Xlr :: %s :: %s (help available)" % (label, message)
 
     if len(message) > 10000:
         raise ValueError('Message too long')
@@ -76,7 +77,6 @@ def hipchat_notify(token, room, message, label, color='yellow', notify=False,
 
         latest_messages[ro] = hipchat_get_last_message_id(token, ro, host=host)
 
-
 def hipchat_poll_for_ack(token, rooms, user, label, positive, negative, hold, interval=10,timeout=0, host='api.hipchat.com'):
 
     timeout_counter = 0
@@ -101,31 +101,36 @@ def hipchat_poll_for_ack(token, rooms, user, label, positive, negative, hold, in
 
 
         for m in messages_to_user:
-
+            print m
             if label in m['message'] :
 
 
                 for a in positive.split(';'):
                     if a in m['message']:
-                        print "acknowledged by {0}".format(m['from']['name'])
-                        hipchat_notify(token, room, "release message acknowledged", label, color="green", host=host)
+                        print "{0}:acknowledged by {1}".format(label, m['from']['name'])
+                        hipchat_notify(token, rooms, "release message acknowledged by %s" % m['from']['name'], label, color="green", host=host)
                         return "Ack"
 
                 for a in negative.split(';'):
                     if a in m['message']:
-                        print "denied by {0}".format(m['from']['name'])
-                        hipchat_notify(token, room, "release message Denied", label, color="red", host=host)
+                        print "{0}:Denied by {1}".format(label, m['from']['name'])
+                        hipchat_notify(token, rooms, "release message Denied by %s" % m['from']['name'], label, color="red", host=host)
                         return "Denied"
 
                 for a in hold.split(';'):
                     if a in m['message']:
-                        print "time period extended by {0}".format(m['from']['name'])
-                        hipchat_notify(token, room, "release message timeout period extended", label, color="yellow", host=host)
+                        print "{0}:Time period extended by {1}".format(label, m['from']['name'])
+                        hipchat_notify(token, rooms, "release message timeout period extended by %s" % m['from']['name'], label, color="yellow", host=host)
                         timeout_counter = 0
 
+            elif 'help' in m['message']:
 
+                me = """possible commands:
+                        acknowledged: %s
+                        Deny: %s
+                        Hold: %s""" % (positive.replace(';', ' '), str(negative).replace(';', ' '), str(hold).replace(';', ' '))
 
-
+                hipchat_notify(token, room, me, label, color="yellow", host=host)
 
         time.sleep(interval)
         timeout_counter += interval
@@ -151,7 +156,7 @@ def hipchat_get_recent_history_for_room(token, room, host='api.hipchat.com'):
     latest_messages[room] = hipchat_get_last_message_id(token, room, host=host)
 
     try:
-        print "executing request %s" % url
+        # print "executing request %s" % url
         r = requests.get(url, headers=headers, verify=False)
         r.raise_for_status()
         messages = json.loads(r.text)
@@ -172,7 +177,7 @@ def hipchat_get_last_message_id(token, room, host='api.hipchat.com'):
     headers['Authorization'] = "Bearer " + token
 
     try:
-        print "executing request %s" % url
+        # print "executing request %s" % url
         r = requests.get(url, headers=headers, verify=False)
 
         r.raise_for_status()
@@ -207,8 +212,8 @@ def get_mention_name_from_msg(msg, mtype='from'):
 
 
 try:
-    hipchat_notify(token, room, message,label, color, host=serverName)
-    answer = hipchat_poll_for_ack(token, room, user, label, command_positive, command_negative, command_hold, timeout=timeout, host=serverName)
+    hipchat_notify(token, room, message,label, color, host=serverName, notify=notify)
+    answer = hipchat_poll_for_ack(token, room, user, label, command_positive, command_negative, command_hold, timeout=timeout, host=serverName, interval=checkInterval)
     if answer == "Ack" :
         sys.exit(0)
     elif answer == "Denied" :
