@@ -6,6 +6,8 @@
         <property name="serverName" default="api.hipchat.com" kind="string"/>
         <property name="proxyUrl" required="false" kind="string"/>
         <property name="token" default="" kind="string" password="true"/>
+        <property name="tokenV1" default="" kind="string" password="true"/>
+
   </type>
 
 <!-- tasks -->
@@ -20,6 +22,8 @@
   </type>
 <!-- non virtuals -->
 <type type="HipChat.SendMessageToRoom" extends="HipChat.BasicTask" virtual="false"/>
+<!-- non virtuals -->
+<type type="HipChat.SendMessageToRoomV1" extends="HipChat.BasicTask" virtual="false"/>
 
 <type type="HipChat.SendMessageToRoomAndWaitForAck" extends="HipChat.BasicTask" virtual="false">
         <property name="user" default="" required="true" category="input" />
