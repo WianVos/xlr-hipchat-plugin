@@ -25,6 +25,13 @@ releaseTitle = release.getTitle()
 
 label = releaseId.split('/')[1]
 
+def debug_print_response(response):
+    print "Response Headers"
+    print r.headers
+
+    print "Response Body"
+    print r.text
+
 
 def hipchat_notify(token, room, message, label, color='yellow', notify=False,
                    format='text', host='api.hipchat.com'):
@@ -73,6 +80,10 @@ def hipchat_notify(token, room, message, label, color='yellow', notify=False,
             'color': color
         }
         r = requests.post(url, data=json.dumps(payload), headers=headers, verify=False)
+
+        if $debug == True :
+            debug_print_response(r)
+
         r.raise_for_status()
 
         latest_messages[ro] = hipchat_get_last_message_id(token, ro, host=host)
@@ -158,6 +169,8 @@ def hipchat_get_recent_history_for_room(token, room, host='api.hipchat.com'):
     try:
         # print "executing request %s" % url
         r = requests.get(url, headers=headers, verify=False)
+        if debug == True:
+            debug_print_response(r)
         r.raise_for_status()
         messages = json.loads(r.text)
     except Exception:
@@ -179,10 +192,12 @@ def hipchat_get_last_message_id(token, room, host='api.hipchat.com'):
     try:
         # print "executing request %s" % url
         r = requests.get(url, headers=headers, verify=False)
-
+        if debug == True:
+            debug_print_response(r)
         r.raise_for_status()
         message = json.loads(str(r.text))
     except Exception:
+
             print "unable to decode information provided by %s" % url
             sys.exit(2)
     except JSONDecodeError:

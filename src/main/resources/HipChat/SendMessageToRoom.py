@@ -63,7 +63,7 @@ def hipchat_notify(token, room, message, color='yellow', notify=False,
         'message_format': format,
         'color': color
     }
-    r = requests.post(url, data=json.dumps(payload), headers=headers, verify=False, timeout=10)
+    r = requests.post(url, data=json.dumps(payload), headers=headers, verify=False, timeout=60)
     r.raise_for_status()
 
 

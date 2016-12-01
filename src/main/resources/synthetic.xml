@@ -2,41 +2,46 @@
 <synthetic xsi:schemaLocation="http://www.xebialabs.com/deployit/synthetic synthetic.xsd" xmlns="http://www.xebialabs.com/deployit/synthetic" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 <!-- config objects -->
-  <type type="HipChat.HipChatServer" extends="xlrelease.Configuration">
-        <property name="serverName" default="api.hipchat.com" kind="string"/>
-        <property name="proxyUrl" required="false" kind="string"/>
-        <property name="token" default="" kind="string" password="true"/>
-        <property name="tokenV1" default="" kind="string" password="true"/>
+  <type type="HipChat.HipChatChatServer" extends="xlrelease.Configuration">
+        <property name="serverName" default="api.HipChatchat.com" kind="string"/>
+        <property name="proxyUrl" required="false" kind="string" />
+        <property name="username" default="" kind="string" />
+        <property name="password" default="" kind="string" password="true" />
+        <property name="token" default="" kind="string" password="true" />
 
   </type>
 
 <!-- tasks -->
   <type type="HipChat.BasicTask" extends="xlrelease.PythonScript" virtual="true">
-          <property name="hipchatServer" label="HipChat server to use" kind="ci" referenced-type="HipChat.HipChatServer" category="input" />
-          <property name="message" default="" size="large" required="true" category="input" />
-          <property name="room" default="" required="true" category="input" />
-          <property name="urgent" default="false" category="input" kind="boolean" />
           <property name="taskColor" hidden="true" default="#0000ff"/>
           <property name="iconLocation" default="HipChat/hipchat.png" hidden="true"/>
-          <property name="checkInterval" default="20" hidden="true" kind="integer" category="input"/>
+          <property name="debug" label="debug logging in logfile" category="input" kind="boolean" default="false" />
   </type>
 <!-- non virtuals -->
-<type type="HipChat.SendMessageToRoom" extends="HipChat.BasicTask" virtual="false"/>
-<!-- non virtuals -->
-<type type="HipChat.SendMessageToRoomV1" extends="HipChat.BasicTask" virtual="false"/>
+<type type="HipChat.SendMessageToRoom" extends="xlrelease.PythonScript" virtual="false">
+        <property name="HipChatchatServer" label="HipChatChat server to use" kind="ci" referenced-type="HipChat.HipChatChatServer" category="input" />
+        <property name="message" default="" required="true" category="input" />
+        <property name="room" default="" required="true" category="input" />
+        <property name="urgent" default="false" category="input" kind="boolean" />
+</type>
 
 <type type="HipChat.SendMessageToRoomAndWaitForAck" extends="HipChat.BasicTask" virtual="false">
+        <property name="HipChatchatServer" label="HipChatChat server to use" kind="ci" referenced-type="HipChat.HipChatChatServer" category="input" />
+        <property name="message" default="" required="true" category="input" />
         <property name="user" default="" required="true" category="input" />
+        <property name="room" default="" required="true" category="input" />
+        <property name="urgent" default="false" category="input" kind="boolean" />
         <property name="timeout" label="wait for reply time in seconds:" kind="integer" category="input"/>
+        <property name="label" label="label to use when adressing this msg" kind="string" category="input" />
         <property name="continueOnTimeout" label="continue the release if the acknowledge times out ?" kind="boolean" default="false" category="input"/>
-        <property name="command_positive" label="string to confirm the message (multiple strings accepted)" category="input" kind="string" default="go;yes;true;avanti" hidden="true"/>
-        <property name="command_negative" label="string to denie the message (multiple strings accepted)" category="input" kind="string" default="no;break;die;kill" hidden="true" />
-        <property name="command_hold" label="string to hold on the message (multiple strings accepted)" category="input" kind="string" default="hold" hidden="true"/>
+        <property name="command_positive" label="string to confirm the message (multiple strings accepted)" category="input" kind="string" default="go;yes;true;avanti" />
+        <property name="command_negative" label="string to denie the message (multiple strings accepted)" category="input" kind="string" default="no;break;die;kill" />
+        <property name="command_hold" label="string to hold on the message (multiple strings accepted)" category="input" kind="string" default="hold" />
 </type>
 
 
-<!-- <type type="hip.SendCardToRoom" extends="xlrelease.PythonScript" virtual="false">
-        <property name="hipchatServer" label="HipChat server to use" kind="ci" referenced-type="hip.HipChatServer" category="input" />
+<!-- <type type="HipChat.SendCardToRoom" extends="xlrelease.PythonScript" virtual="false">
+        <property name="HipChatchatServer" label="HipChatChat server to use" kind="ci" referenced-type="HipChat.HipChatChatServer" category="input" />
         <property name="message" default="" required="true" category="input" />
         <property name="room" default="" required="true" category="input" />
 </type> -->
